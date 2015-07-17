@@ -98,10 +98,10 @@ push f e = \t -> (f <$> e t) t
 -- What to do with merge and fan, again DMap seems like an implementation
 -- detail. Is tuple enough for semantic meaning ?
 merge :: Event a -> Event b -> Event (These a b)
-merge ea eb = \t -> (ea t, eb t)
+merge ea eb = \t -> These (ea t) (eb t)
 
 fan :: Event (These a b) -> (Event a, Event b)
-fan e = (\t -> fst $ e t, \t -> snd $ e t)
+fan e = (\t -> this $ e t, \t -> that $ e t)
 
 switch :: Behavior (Event a) -> Event a
 switch b = \t -> b t t
