@@ -70,6 +70,8 @@ stepper a e = \t -> last (a : before e t)
 
 -- XXX Just a start, obviously this has lots of errors and is imcomplete
 
+import Data.These
+
 type T  =  TOS -- Totally ordered set.
 
 type Behavior a = T -> a
@@ -95,10 +97,10 @@ push f e = \t -> (f <$> e t) t
 
 -- What to do with merge and fan, again DMap seems like an implementation
 -- detail. Is tuple enough for semantic meaning ?
-merge :: Event a -> Event b -> Event (a, b)
+merge :: Event a -> Event b -> Event (These a b)
 merge ea eb = \t -> (ea t, eb t)
 
-fan :: Event (a, b) -> (Event a, Event b)
+fan :: Event (These a b) -> (Event a, Event b)
 fan e = (\t -> fst $ e t, \t -> snd $ e t)
 
 switch :: Behavior (Event a) -> Event a
