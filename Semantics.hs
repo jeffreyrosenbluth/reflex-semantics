@@ -65,7 +65,40 @@ stepper :: a -> Event a -> Behavior a
 stepper a e = \t -> last (a : before e t)
 
 ------------------------------------------------------------------
--- 2. Reflex FRP
+-- 2. FRPNow
+------------------------------------------------------------------
+
+type Event a = (Time+,a)
+
+never :: Event a
+never = (∞, undefined)
+
+instance Monad Event where
+  return x = (-∞,x)
+  (ta,a) >>= f = let (tb,b) = f a
+                 in (max ta tb, b)
+
+type Behavior a = Time -> a
+
+instance Monad Behavior where
+  return x = λt -> x
+  m >>= f  = λt -> f (m t) t
+
+instance MonadFix Behavior where
+  mfix f = λt -> let x = f x t in x
+
+switch :: Behavior a -> Event (Behavior a) -> Behavior a
+switch b (ts,s) = λn ->
+  if n < ts then b n else s n
+
+whenJust :: Behavior (Maybe a) -> Behavior (Event a)
+whenJust b = λt ->
+  let w = minSet { t' | t' >= t && isJust (b t') }
+  in  if w == ∞ then never
+      else (w, fromJust (b w))
+
+------------------------------------------------------------------
+-- 3. Reflex FRP
 ------------------------------------------------------------------
 
 -- XXX Just a start, obviously this has lots of errors and is imcomplete
@@ -89,11 +122,10 @@ never = \t -> Nothing
 constant :: a -> Behavior a
 constant x = \t -> x
 
--- Not sure what to do about the whole push / pull thing.
--- On one hand, they semm like an implementation detail on the
--- other hand, they are a key part of Reflex ?
-push :: (a -> Behavior b) -> Event a -> Event b
-push f e = \t -> (f <$> e t) t
+attachWithMaybe :: (a -> b -> Maybe c) -> Behavior t a -> Event t b -> Event t c
+attachWithMaybe f b e = \t -> case e t of
+                                Nothing -> Nothing
+                                Just s  -> f (b t) s
 
 merge :: Event a -> Event b -> Event (These a b)
 merge ea eb = \t -> These (ea t) (eb t)
