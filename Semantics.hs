@@ -15,14 +15,15 @@
 -- 1. Push-Pull Functional Reactive Programming
 ------------------------------------------------------------------
 
-type `T ` =  TOS -- Totally ordered set.
-type T+ = TOS+ -- TOS extended with infinity and -infinity.
+type Time = Double
 
-time :: Behavior T
+time :: Behavior Time
 time = id
 
-type Behavior a = T -> a
-type Event a    = [(T+, a)]
+type Behavior a = Time -> a
+type Event a    = [(Time, a)] -- none-decreasing times
+-- or
+-- newtype Event a = Event (Behavior [a]) deriving (Monoid, Functor)
 
 -- lift1 in Fran.
 instance  Functor Behavior where
@@ -52,13 +53,13 @@ instance Monad Event where
   return a = [(-infinity, a)]
   join ma = foldr merge [] (delay <$> ma)
 
-delay :: (T+, Event a) -> Event a
+delay :: (Time, Event a) -> Event a
 delay (te, e) = [(max te ta, a) | (ta, a) <- e]
 
 switcher :: Behavior a -> Event (Behavior a) -> Behavior a
 switcher b e = \t -> last (b : before e t) t
 
-before :: Event a -> T -> [a]
+before :: Event a -> Time-> [a]
 before e t = [a | (ta, a) <- e, ta < t]
 
 stepper :: a -> Event a -> Behavior a
@@ -110,6 +111,10 @@ type Event a    = Time -> Maybe a
 
 instance Functor Behavior where
   fmap f b = \t -> f . b $ t
+
+instance Applicative Behavior where
+  pure a  = const a
+  f <*> x = \t -> (f t) (x t)
 
 instance Functor Event where
   famp f e = \t -> f <$> e t
