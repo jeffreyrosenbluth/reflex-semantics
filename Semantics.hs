@@ -15,7 +15,7 @@
 -- 1. Push-Pull Functional Reactive Programming
 ------------------------------------------------------------------
 
-type T  =  TOS -- Totally ordered set.
+type `T ` =  TOS -- Totally ordered set.
 type T+ = TOS+ -- TOS extended with infinity and -infinity.
 
 time :: Behavior T
@@ -101,14 +101,12 @@ whenJust b = λt ->
 -- 3. Reflex FRP
 ------------------------------------------------------------------
 
--- XXX Just a start, obviously this has lots of errors and is imcomplete
-
 import Data.These
 
-type T  =  TOS -- Totally ordered set.
+type Time  =  Double  -- Any totally ordered set.
 
-type Behavior a = T -> a
-type Event a    = T -> Maybe a
+type Behavior a = Time -> a
+type Event a    = Time -> Maybe a
 
 instance Functor Behavior where
   fmap f b = \t -> f . b $ t
@@ -122,10 +120,8 @@ never = \t -> Nothing
 constant :: a -> Behavior a
 constant x = \t -> x
 
-attachWithMaybe :: (a -> b -> Maybe c) -> Behavior t a -> Event t b -> Event t c
-attachWithMaybe f b e = \t -> case e t of
-                                Nothing -> Nothing
-                                Just s  -> f (b t) s
+push :: (a -> (Event b)) -> Event a -> Event b
+push f e = \t -> e t >>= \a -> f a t
 
 merge :: Event a -> Event b -> Event (These a b)
 merge ea eb = \t -> These (ea t) (eb t)
@@ -139,11 +135,7 @@ switch b = \t -> b t t
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t t
 
--- I don't think these are part of the denotational semantics.
-sample :: Behavior a -> T -> a
-sample b t = b t
-
-hold :: a -> Event a -> T -> Behavior a
+hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 = \t ->
   let s = sup{u | u <= t && isJust (e u)}
   in if t <= t0 then a else fromJust (e s)
