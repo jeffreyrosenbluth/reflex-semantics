@@ -117,13 +117,10 @@ instance Applicative Behavior where
   f <*> x = \t -> (f t) (x t)
 
 instance Functor Event where
-  famp f e = \t -> f <$> e t
+  famp f e = \t -> f <$> e t 
 
 never :: Event a
 never = \t -> Nothing
-
-constant :: a -> Behavior a
-constant x = \t -> x
 
 push :: (a -> (Event b)) -> Event a -> Event b
 push f e = \t -> e t >>= \a -> f a t
