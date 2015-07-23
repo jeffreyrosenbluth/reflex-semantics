@@ -142,6 +142,6 @@ coincidence e = \t -> e t t
 
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 = \t ->
-  -- of course sup (supremum is not haskell, but it is a valid denotation.)
-  let s = sup [u | u <= t && isJust (e u)]
+  -- of course sup (supremum) is not haskell, but it is a valid denotation.
+  let s = sup [r | r <= t && isJust (e r)]
   in if t <= t0 then a else fromJust (e s)
