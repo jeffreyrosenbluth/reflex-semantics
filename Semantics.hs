@@ -143,7 +143,7 @@ coincidence e = \t -> e t t
 sample :: Behavior a -> T -> a
 sample b t = b t
 
-hold :: a -> Event a -> Behavior a
-hold a e = \t -> case e t of
-                   Nothing -> a
-                   Just b  -> b
+hold :: a -> Event a -> T -> Behavior a
+hold a e t0 = \t ->
+  let s = sup{u | u <= t && isJust (e u)}
+  in if t <= t0 then a else fromJust (e s)
