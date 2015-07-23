@@ -137,5 +137,5 @@ coincidence e = \t -> e t t
 
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 = \t ->
-  let s = sup{u | u <= t && isJust (e u)}
+  let s = sup [u | u <= t && isJust (e u)]
   in if t <= t0 then a else fromJust (e s)
