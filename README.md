@@ -1,10 +1,10 @@
 # reflex-semantics
 Denotational semantics for reflex frp
 
-To do
------
+Questions
+---------
 
-- [ ] Check to see if I have correctly translated Conal's Push-Pull
-      semantics to the notation used in Practical Principled FRP.
-- [ ] Correct and complete the reflex semantics.
-- [ ] Compare the two.
+- [ ] Is this a valid denotational semantics?
+- [ ] Does spider faithfully implement this semantics?
+- [ ] Can our semantics be considered FRP?
+- [ ] Is this interface inherently leaky?
