@@ -148,4 +148,4 @@ hold t0 a e = \t ->
 
 --------------------------------------------------------------
 switcher :: Time -> Behavior a -> Event (Behavior a) -> Behavior a
-swithcer t0 b eb = hold t0 b eb t t
+swithcer t0 b eb = \t -> hold t0 b eb t t
