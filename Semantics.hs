@@ -117,7 +117,7 @@ instance Applicative Behavior where
   f <*> x = \t -> (f t) (x t)
 
 instance Functor Event where
-  famp f e = \t -> f <$> e t 
+  fmap f e = \t -> f <$> e t
 
 never :: Event a
 never = \t -> Nothing
@@ -128,6 +128,7 @@ push f e = \t -> e t >>= \a -> f a t
 merge :: Event a -> Event b -> Event (These a b)
 merge ea eb = \t -> These (ea t) (eb t)
 
+-- Is this part of the semantics or a convenience function?
 fan :: Event (These a b) -> (Event a, Event b)
 fan e = (\t -> justThis $ e t, \t -> justThat $ e t)
 
@@ -137,8 +138,14 @@ switch b = \t -> b t t
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t t
 
-hold :: a -> Event a -> Time -> Behavior a
-hold a e t0 = \t ->
+-- Alternaativley we can make switcher a primitive and derive hold.
+hold :: Time -> a -> Event a -> Behavior a
+hold t0 a e = \t ->
   -- of course sup (supremum) is not haskell, but it is a valid denotation.
-  let s = sup [r | r <= t && isJust (e r)]
+  -- I think < is right, but it could be <= ?
+  let s = sup [r | r < t && isJust (e r)]
   in if t <= t0 then a else fromJust (e s)
+
+--------------------------------------------------------------
+switcher :: Time -> Behavior a -> Event (Behavior a) -> Behavior a
+swithcer t0 b eb = hold t0 b eb t t
