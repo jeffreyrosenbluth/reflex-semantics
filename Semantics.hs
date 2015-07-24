@@ -139,7 +139,7 @@ switch b = \t -> b t t
 -- push-pull is inherently leaky. I suspect coincidence and perhaps switch
 -- are as well, but I need to look into it.
 coincidence :: Event (Event a) -> Event a
-coincidence e = \t -> e t t
+coincidence e = \t -> e t >>= \f -> f t
 
 -- Alternaativley we can make switcher a primitive and derive hold.
 hold :: Time -> a -> Event a -> Behavior a
