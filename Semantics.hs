@@ -149,6 +149,12 @@ hold t0 a e = \t ->
   let s = sup [r | r < t && isJust (e r)]
   in if t <= t0 then a else fromJust (e s)
 
+-- I wonder if we could get away with:
+hold' :: a -> Event a -> Behavior (Behavior a)
+hold' a e = \t0 -> \t
+ let s = sup [r | r < t && isJust (e r)]
+ in if t <= t0 then a else fromJust (e s)
+
 --------------------------------------------------------------
 switcher :: Time -> Behavior a -> Event (Behavior a) -> Behavior a
 swithcer t0 b eb = \t -> hold t0 b eb t t
