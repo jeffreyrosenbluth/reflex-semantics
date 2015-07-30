@@ -141,20 +141,12 @@ switch b = \t -> b t t
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t >>= \f -> f t
 
--- Alternaativley we can make switcher a primitive and derive hold.
-hold :: Time -> a -> Event a -> Behavior a
-hold t0 a e = \t ->
+hold :: a -> Event a -> Behavior (Behavior a)
+hold a e = \t0 -> \t
   -- of course sup (supremum) is not haskell, but it is a valid denotation.
   -- I think < is right, but it could be <= ?
   let s = sup [r | r < t && isJust (e r)]
   in if t <= t0 then a else fromJust (e s)
 
--- I wonder if we could get away with:
-hold' :: a -> Event a -> Behavior (Behavior a)
-hold' a e = \t0 -> \t
- let s = sup [r | r < t && isJust (e r)]
- in if t <= t0 then a else fromJust (e s)
-
---------------------------------------------------------------
-switcher :: Time -> Behavior a -> Event (Behavior a) -> Behavior a
-swithcer t0 b eb = \t -> hold t0 b eb t t
+-- What to do about sample?
+sample :: Behavior a ->
