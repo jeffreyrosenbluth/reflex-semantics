@@ -9,6 +9,7 @@
 -- the right hand side is math.
 ------------------------------------------------------------------
 
+type Behavior a = Time -> a
 type Event a = (Time+,a)
 
 never :: Event a
@@ -19,8 +20,6 @@ instance Monad Event where
   (ta,a) >>= f = let (tb,b) = f a
                  in (max ta tb, b)
 
-type Behavior a = Time -> a
-
 instance Monad Behavior where
   return x = λt -> x
   m >>= f  = λt -> f (m t) t
@@ -28,7 +27,7 @@ instance Monad Behavior where
 instance MonadFix Behavior where
   mfix f = λt -> let x = f x t in x
 
--- Frans's swithcer
+-- Frans's switcher
 switch :: Behavior a -> Event (Behavior a) -> Behavior a
 switch b (ts,s) = λn ->
   if n < ts then b n else s n

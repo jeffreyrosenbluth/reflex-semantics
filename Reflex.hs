@@ -50,6 +50,7 @@ switch b = \t -> b t t
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t >>= \f -> f t
 
+-- switcher can be derived from hold.
 hold :: a -> Event a -> Behavior (Behavior a)
 hold a e = \t0 -> \t
   -- of course sup (supremum) is not haskell, but it is a valid denotation.
