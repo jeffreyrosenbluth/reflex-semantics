@@ -28,6 +28,7 @@ instance Monad Behavior where
 instance MonadFix Behavior where
   mfix f = λt -> let x = f x t in x
 
+-- Frans's swithcer
 switch :: Behavior a -> Event (Behavior a) -> Behavior a
 switch b (ts,s) = λn ->
   if n < ts then b n else s n
@@ -37,3 +38,14 @@ whenJust b = λt ->
   let w = minSet { t' | t' >= t && isJust (b t') }
   in  if w == ∞ then never
       else (w, fromJust (b w))
+
+-------------------------------------------------------
+-- XXX Not part of denotational semantics
+-------------------------------------------------------
+-- Implemented in terms of whenJust
+change   :: Eq a => Behavior a -> Behavior (Event ())
+when     :: Behavior Bool -> Behavior (Event ())
+snapshot :: Behavior a -> Event () -> Behavior (Event a)
+
+-- In the Now Monad
+sample :: Behavior a -> Now a
