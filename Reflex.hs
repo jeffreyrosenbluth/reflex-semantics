@@ -25,6 +25,10 @@ instance Applicative Behavior where
   pure a  = const a
   f <*> x = \t -> (f t) (x t)
 
+instance Monad Behavior where
+  return = pure
+  f >>= k = \t -> k (f t) t
+
 instance Functor Event where
   fmap f e = \t -> f <$> e t
 
