@@ -58,5 +58,11 @@ hold a e = \t0 -> \t
   let s = sup [r | r < t && isJust (e r)]
   in if t <= t0 then a else fromJust (e s)
 
+-- or
+hold :: a -> Event a -> Time -> Behavior a
+hold a e t0 = \t ->
+  let s = sup [r | r < t && isJust (e r)]
+  in if t <= t0 then a else fromJust (e s)
+
 -- What to do about sample?
 sample :: Behavior a ->
