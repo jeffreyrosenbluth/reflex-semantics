@@ -65,5 +65,8 @@ hold a e t0 = \t ->
   in if t <= t0 then a else fromJust (e s)
 
 -- What to do about sample?
+sample :: Behavior a -> Behavior a
+sample = id
+
 sample :: Behavior a -> Time -> a
 sample b t = b t
