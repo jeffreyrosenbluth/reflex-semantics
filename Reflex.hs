@@ -51,6 +51,7 @@ switch b = \t -> b t t
 -- According to footnote 7 in "prprfrp" (FRPNow) the join operator in Conal's
 -- push-pull is inherently leaky. My intuition is that we are ok here, but we
 -- shouuld check.
+-- Can we make Event into a monad using this as join?
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t >>= \f -> f t
 
