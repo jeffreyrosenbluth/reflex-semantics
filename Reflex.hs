@@ -2,20 +2,17 @@
 -- Reflex FRP
 ------------------------------------------------------------------
 -- The denotational semantics of Reflex FRP
--- using notation similar to that in FRPNow,
--- http://www.cse.chalmers.se/~atze/papers/prprfrp.pdf, since
--- it is the closest thing I have seen to haskell.
-
 -- We take (=) to indicate semantic equality.
--- In other words, the left hand side of an equals sign is haskell and
--- the right hand side is math.
+-- In other words, the left hand side of an equals sign is haskell
+-- syntax and the right hand side is its mathematical meaning.
 ------------------------------------------------------------------
 
--- Not part of semantics.
+-- Not part of semantics -----------------------------------------
 data These a b = This a | That b | These a b
 
 -- Any totally ordered set, should be abstract.
 type Time  =  Double
+------------------------------------------------------------------
 
 type Behavior a = Time -> a
 type Event a    = Time -> Maybe a
