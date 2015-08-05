@@ -8,7 +8,7 @@
 ------------------------------------------------------------------
 
 -- Not part of semantics -----------------------------------------
-data These a b = This a | That b | These a b
+data Both a b = First a | Second b | Both a b
 
 -- Any totally ordered set, should be abstract.
 type Time  =  Double
@@ -37,13 +37,13 @@ never = \t -> Nothing
 push :: (a -> (Event b)) -> Event a -> Event b
 push f e = \t -> e t >>= \a -> f a t
 
-merge :: Event a -> Event b -> Event (These a b)
+merge :: Event a -> Event b -> Event (Both a b)
 merge ea eb = \t ->
   case (ea t, eb t) of
     (Nothing, Nothing) -> Nothing
-    (a      , Nothing) -> Just (This a)
-    (Nothing, b      ) -> Just (That b)
-    (a      , b      ) -> Just (These a b)
+    (a      , Nothing) -> Just (First a)
+    (Nothing, b      ) -> Just (Second b)
+    (a      , b      ) -> Just (Both a b)
 
 switch :: Behavior (Event a) -> Event a
 switch b = \t -> b t t
