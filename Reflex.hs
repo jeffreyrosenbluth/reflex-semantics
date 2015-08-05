@@ -11,9 +11,11 @@
 -- the right hand side is math.
 ------------------------------------------------------------------
 
-import Data.These
+-- Not part of semantics.
+data These a b = This a | That b | These a b
 
-type Time  =  Double  -- Any totally ordered set, should be abstract.
+-- Any totally ordered set, should be abstract.
+type Time  =  Double
 
 type Behavior a = Time -> a
 type Event a    = Time -> Maybe a
@@ -39,39 +41,23 @@ push :: (a -> (Event b)) -> Event a -> Event b
 push f e = \t -> e t >>= \a -> f a t
 
 merge :: Event a -> Event b -> Event (These a b)
-merge ea eb = \t -> These (ea t) (eb t)
+merge ea eb = \t ->
+  case (ea t, eb t) of
+    (Nothing, Nothing) -> Nothing
+    (a      , Nothing) -> Just (This a)
+    (Nothing, b      ) -> Just (That b)
+    (a      , b      ) -> Just (These a b)
 
--- Is this part of the semantics or a convenience function?
-fan :: Event (These a b) -> (Event a, Event b)
-fan e = (\t -> justThis $ e t, \t -> justThat $ e t)
 
 switch :: Behavior (Event a) -> Event a
 switch b = \t -> b t t
 
--- According to footnote 7 in "prprfrp" (FRPNow) the join operator in Conal's
--- push-pull is inherently leaky. My intuition is that we are ok here, but we
--- shouuld check.
--- Can we make Event into a monad using this as join?
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t >>= \f -> f t
 
--- switcher can be derived from hold.
-hold :: a -> Event a -> Behavior (Behavior a)
-hold a e = \t0 -> \t
-  -- of course sup (supremum) is not haskell, but it is a valid denotation.
-  -- I think < is right, but it could be <= ?
-  let s = sup [r | r < t && isJust (e r)]
-  in if t <= t0 then a else fromJust (e s)
-
--- or
+-- Technically t shoud never be strictly less than t0;
+-- this would signal an implementation error.
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 = \t ->
   let s = sup [r | r < t && isJust (e r)]
-  in if t <= t0 then a else fromJust (e s)
-
--- What to do about sample?
-sample :: Behavior a -> Behavior a
-sample = id
-
-sample :: Behavior a -> Time -> a
-sample b t = b t
+  in if t <= t0 then a else fromJust (e s)-- < is an error in implementation.
