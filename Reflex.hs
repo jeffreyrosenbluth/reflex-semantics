@@ -53,7 +53,9 @@ coincidence e = \t -> e t >>= \f -> f t
 
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 = \t ->
-  let s = sup [r | r < t && isJust (e r)]
+  let s = {r : r < t && isJust (e r)}
   -- Technically t shoud never be strictly less than t0;
   -- this would signal an implementation error.
-  in if t <= t0 then a else fromJust (e s)
+  in if t <= t0 || s == {}
+       then a
+       else fromJust (e (sup s))
