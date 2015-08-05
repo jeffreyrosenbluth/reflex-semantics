@@ -48,16 +48,15 @@ merge ea eb = \t ->
     (Nothing, b      ) -> Just (That b)
     (a      , b      ) -> Just (These a b)
 
-
 switch :: Behavior (Event a) -> Event a
 switch b = \t -> b t t
 
 coincidence :: Event (Event a) -> Event a
 coincidence e = \t -> e t >>= \f -> f t
 
--- Technically t shoud never be strictly less than t0;
--- this would signal an implementation error.
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 = \t ->
   let s = sup [r | r < t && isJust (e r)]
-  in if t <= t0 then a else fromJust (e s)-- < is an error in implementation.
+  -- Technically t shoud never be strictly less than t0;
+  -- this would signal an implementation error.
+  in if t <= t0 then a else fromJust (e s)
