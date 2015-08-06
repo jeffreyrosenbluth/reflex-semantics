@@ -47,15 +47,13 @@ never ≗ λt -> Nothing
 push :: (a -> (Event b)) -> Event a -> Event b
 push f e ≗ λt -> e t >>= λa -> f a t
 
--- Since merge allows combining Events of different types,
--- We don't have a Monoid instance based on never and merge.
 merge :: Event a -> Event b -> Event (Both a b)
 merge ea eb ≗ λt ->
   case (ea t, eb t) of
     (Nothing, Nothing) -> Nothing
-    (a      , Nothing) -> Just (First a)
-    (Nothing, b      ) -> Just (Second b)
-    (a      , b      ) -> Just (Both a b)
+    (Just a , Nothing) -> Just (First a)
+    (Nothing, Just b ) -> Just (Second b)
+    (Just a , Just b ) -> Just (Both a b)
 
 switch :: Behavior (Event a) -> Event a
 switch b ≗ λt -> b t t
