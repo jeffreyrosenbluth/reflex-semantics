@@ -77,3 +77,9 @@ hold a e t0 ≗ λt ->
        -- that the behavior changes after (not at the same time)
        -- the event fires.
        else fromJust (e (sup s))
+
+-- XXX Do you think we should include this?
+-- Not really part of the denotational semantics as it is defined in
+-- terms of hold.
+switcher :: Behavior a -> Event (Behavior a) -> Time -> Behavior a
+swithcer b eb t0 = λt -> hold b eb t0 t t
