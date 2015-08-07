@@ -16,9 +16,10 @@ type Time  ≗  (Eq a, Ord a) => a
 
 type Behavior a ≗ Time -> a
 
--- We maintain the invariant that the range of any Event, contains
--- a countable number of Just values. No generality is lost by this
--- invariant, as the origingal denotation for Event a ≗ [(t, a)].
+-- We maintain the invariant that for any two Times s < t, the
+-- number of Just values in the interval [s, t) is finite. A
+-- believe that somehting like this is technically necessary in
+-- the semantics of Push-Pull FRP as well.
 -- This choice does however, restrict two Events from occuring at
 -- the same time, but we can achieve this using the merge function
 -- which, unlike the origingal FRP semantics, keeps both values of
@@ -67,16 +68,16 @@ coincidence e ≗ λt -> e t >>= λf -> f t
 -- the supremum of the empty set.
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 ≗ λt ->
-  let s ≗ {r : r < t && isJust (e r)}
+  let s ≗ [r | r >= t0, r < t && isJust (e, r)]
   -- Technically t shoud never be strictly less than t0;
   -- this would signal an implementation error.
-  in if t <= t0 || s == {} -- the empty set
+  in if t <= t0 || null s
        then a
-       -- Here we rely on the invariant of a countable number
-       -- of Just values in the range of the Event to insure
+       -- Here we rely on the invariant that only a finte number
+       -- of Just values occur in the interval [t0, t) to insure
        -- that the behavior changes after (not at the same time)
        -- the event fires.
-       else fromJust (e (sup s))
+       else fromJust (e (last s))
 
 -- XXX Do you think we should include this?
 -- Not really part of the denotational semantics as it is defined in
