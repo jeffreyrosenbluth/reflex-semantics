@@ -17,7 +17,7 @@ type Time  ≗  (Eq a, Ord a) => a
 type Behavior a ≗ Time -> a
 
 -- We maintain the invariant that for any two Times s < t, the
--- number of Just values in the interval [s, t) is finite. A
+-- number of Just values in the interval (s, t) is finite. A
 -- believe that somehting like this is technically necessary in
 -- the semantics of Push-Pull FRP as well.
 -- This choice does however, restrict two Events from occuring at
@@ -64,17 +64,15 @@ switch b ≗ λt -> b t t
 coincidence :: Event (Event a) -> Event a
 coincidence e ≗ λt -> e t >>= λf -> f t
 
--- XXX I needed to change this around a tad to avoid taking
--- the supremum of the empty set.
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 ≗ λt ->
-  let s ≗ [r | r >= t0, r < t && isJust (e, r)]
+  let s ≗ [r | r > t0 && r < t && isJust (e, r)]
   -- Technically t shoud never be strictly less than t0;
   -- this would signal an implementation error.
   in if t <= t0 || null s
        then a
        -- Here we rely on the invariant that only a finte number
-       -- of Just values occur in the interval [t0, t) to insure
+       -- of Just values occur in the interval (t0, t) to insure
        -- that the behavior changes after (not at the same time)
        -- the event fires.
        else fromJust (e (last s))
