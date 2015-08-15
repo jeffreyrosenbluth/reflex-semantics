@@ -17,9 +17,10 @@ type Time  ≗  (Eq a, Ord a) => a
 type Behavior a ≗ Time -> a
 
 -- We maintain the invariant that for any two Times s < t, the
--- number of Just values in the interval (s, t) is finite. A
+-- number of Just values in the interval (s, t) is finite. I
 -- believe that somehting like this is technically necessary in
 -- the semantics of Push-Pull FRP as well.
+--
 -- This choice does however, restrict two Events from occuring at
 -- the same time, but we can achieve this using the merge function
 -- which, unlike the origingal FRP semantics, keeps both values of
@@ -43,10 +44,11 @@ instance Functor Event where
 never :: Event a
 never ≗ λt -> Nothing
 
--- XXX I think we should say a few words about push and how it
--- differs from the Push-Pull semantics.
-push :: (a -> (Event b)) -> Event a -> Event b
-push f e ≗ λt -> e t >>= λa -> f a t
+pushE :: (a -> (b, Event b)) -> Event a -> Event (Behavior b)
+pushE f e ≗  λt -> (uncurry hold) (f $ e t) t
+
+pushB :: (a -> Behavior (Maybe b)) -> Event a -> Event b
+pushB f e ≗ λt -> f (e t) t
 
 merge :: Event a -> Event b -> Event (Both a b)
 merge ea eb ≗ λt ->
@@ -66,7 +68,7 @@ coincidence e ≗ λt -> e t >>= λf -> f t
 
 hold :: a -> Event a -> Time -> Behavior a
 hold a e t0 ≗ λt ->
-  let s ≗ [r | r > t0 && r < t && isJust (e, r)]
+  let s ≗ [r | r > t0 && r < t && isJust (e r)]
   -- Technically t shoud never be strictly less than t0;
   -- this would signal an implementation error.
   in if t <= t0 || null s
