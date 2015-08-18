@@ -16,15 +16,15 @@ type Time  ≗  (Eq a, Ord a) => a
 
 type Behavior a ≗ Time -> a
 
--- We maintain the invariant that for any two Times s < t, the
+-- Events must satifsy the constraint that for any two Times s < t, the
 -- number of Just values in the interval (s, t) is finite. I
 -- believe that somehting like this is technically necessary in
 -- the semantics of Push-Pull FRP as well.
 --
--- This choice does however, restrict two Events from occuring at
--- the same time, but we can achieve this using the merge function
--- which, unlike the origingal FRP semantics, keeps both values of
--- simultaneous events.
+-- This representation of Events does however, restrict two Events from
+-- occuring at the same time. However, we can gain back the full generality by
+-- this using the merge function which, unlike the Push-Pull FRP semantics,
+-- keeps both values of simultaneous events.
 type Event a ≗ Time -> Maybe a
 
 instance Functor Behavior where
@@ -32,7 +32,7 @@ instance Functor Behavior where
 
 instance Applicative Behavior where
   pure a  ≗ const a
-  f <*> x ≗ λt -> (f t) (x t)
+  f <*> x ≗ λt -> f t (x t)
 
 instance Monad Behavior where
   return ≗ pure
