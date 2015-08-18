@@ -8,7 +8,7 @@
 ------------------------------------------------------------------
 
 -- Not part of the Reflex interface ------------------------------
-data Both a b ≗ First a | Second b | Both a b
+data These a b ≗ This a | That b | These a b
 
 -- Any totally ordered set.
 type Time  ≗  (Eq a, Ord a) => a
@@ -24,7 +24,7 @@ type Behavior a ≗ Time -> a
 -- This representation of Events does however, restrict two Events from
 -- occuring at the same time. However, we can gain back the full generality by
 -- this using the merge function which, unlike the Push-Pull FRP semantics,
--- keeps both values of simultaneous events.
+-- keeps These values of simultaneous events.
 type Event a ≗ Time -> Maybe a
 
 instance Functor Behavior where
@@ -50,13 +50,13 @@ pushE f e ≗  λt -> (uncurry hold) (f $ e t) t
 pushB :: (a -> Behavior (Maybe b)) -> Event a -> Event b
 pushB f e ≗ λt -> f (e t) t
 
-merge :: Event a -> Event b -> Event (Both a b)
+merge :: Event a -> Event b -> Event (These a b)
 merge ea eb ≗ λt ->
   case (ea t, eb t) of
     (Nothing, Nothing) -> Nothing
-    (Just a , Nothing) -> Just (First a)
-    (Nothing, Just b ) -> Just (Second b)
-    (Just a , Just b ) -> Just (Both a b)
+    (Just a , Nothing) -> Just (This a)
+    (Nothing, Just b ) -> Just (That b)
+    (Just a , Just b ) -> Just (These a b)
 
 switch :: Behavior (Event a) -> Event a
 switch b ≗ λt -> b t t
