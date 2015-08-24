@@ -47,8 +47,8 @@ never ≗ λt -> Nothing
 type Push a ≗ Time -> a
 
 class EventMap m where
-  sample :: Behavior a -> Time -> a
-  hold   :: a -> Event a -> Time -> Behavior a
+  sample :: Behavior a -> m a
+  hold   :: a -> Event a -> m (Behavior a)
 
 instance EventMap Push where
   sample ≗ id
