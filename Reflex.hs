@@ -27,6 +27,8 @@ type Behavior a ≗ Time -> a
 -- keeps These values of simultaneous events.
 type Event a ≗ Time -> Maybe a
 
+type Push a ≗ Time -> a
+
 instance Functor Behavior where
   fmap f b ≗ λt -> f . b $ t
 
@@ -44,25 +46,21 @@ instance Functor Event where
 never :: Event a
 never ≗ λt -> Nothing
 
-type Push a ≗ Time -> a
+sample :: Behavior a -> Push a
+sample ≗ id
 
-class EventMap m where
-  sample :: Behavior a -> m a
-  hold   :: a -> Event a -> m (Behavior a)
-
-instance EventMap Push where
-  sample ≗ id
-  hold a e t0 ≗ λt ->
-    let s ≗ [r | r > t0 && r < t && isJust (e r)]
-    -- Technically t shoud never be strictly less than t0;
-    -- this would signal an implementation error.
-    in if t <= t0 || null s
-         then a
-         -- Here we rely on the fact that only a finte number
-         -- of Just values occur in the interval (t0, t) to insure
-         -- that the behavior changes after (not at the same time)
-         -- the event fires.
-         else fromJust (e (last s))
+hold   :: a -> Event a -> Push (Behavior a)
+hold a e t0 ≗ λt ->
+  let s ≗ [r | r > t0 && r < t && isJust (e r)]
+  -- Technically t shoud never be strictly less than t0;
+  -- this would signal an implementation error.
+  in if t <= t0 || null s
+       then a
+       -- Here we rely on the fact that only a finte number
+       -- of Just values occur in the interval (t0, t) to insure
+       -- that the behavior changes after (not at the same time)
+       -- the event fires.
+       else fromJust (e (last s))
 
 push :: (a -> Push (Maybe b)) -> Event a -> Event b
 push f e ≗ \t -> e t >>= \a -> f a t
