@@ -58,7 +58,7 @@ instance EventMap Push where
     -- this would signal an implementation error.
     in if t <= t0 || null s
          then a
-         -- Here we rely on the invariant that only a finte number
+         -- Here we rely on the fact that only a finte number
          -- of Just values occur in the interval (t0, t) to insure
          -- that the behavior changes after (not at the same time)
          -- the event fires.
