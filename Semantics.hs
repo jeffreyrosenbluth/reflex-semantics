@@ -34,7 +34,7 @@ sample (Behavior b) = Push b
 
 hold   :: a -> Event a -> Push (Behavior a)
 hold a (Event e) = Push $ \t0 -> Behavior . memo $ \t ->
-  let s = [r | r <- [(t0+1)..(t-1)], isJust (e r)]
+  let s = [r | r <- [t0..(t-1)], isJust (e r)]
   in if t <= t0 || null s
        then a
        else fromJust (e (last s))
