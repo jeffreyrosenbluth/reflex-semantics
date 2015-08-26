@@ -32,7 +32,7 @@ type Event a ≗ Time -> Maybe a
 --   may only 'sample' Behaviors and 'hold' Events.
 type Push a ≗ Time -> a
 
--- | Semantics Instances. Functor and Applicative instances for Behavior
+-- | Semantics Instances. Functor and applicative instances for Behavior
 --   and Push can be derived from their monad instances.
 instance Monad Behavior where
   return ≗ const
@@ -71,7 +71,7 @@ sample ≗ id
 --   changes after (not at the same time) the event fires.
 hold   :: a -> Event a -> Push (Behavior a)
 hold a e t0 ≗ λt ->
-  let s ≗ [r | r >= t0 && r < t && isJust (e r)]
+  let s ≗ [r | {t0 <= r < t}, && isJust (e r)]
   in if t <= t0 || null s
        then a
        else fromJust (e (last s))
