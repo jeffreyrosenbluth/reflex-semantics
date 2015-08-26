@@ -47,7 +47,7 @@ instance Monad Push where
 
 -- | An Event with no occurrences.
 never :: Event a
-never ≗ λt -> Nothing
+never ≗ const Nothing
 
 -- | Merge two events; the resulting Event will only occur if at least one input
 --   event is occuring.
