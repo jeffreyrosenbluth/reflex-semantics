@@ -71,7 +71,7 @@ sample ≗ id
 --   changes after (not at the same time) the event fires.
 hold   :: a -> Event a -> Push (Behavior a)
 hold a e t0 ≗ λt ->
-  let s ≗ [r | {t0 <= r < t}, && isJust (e r)]
+  let s ≗ [r | {t0 <= r < t}, isJust (e r)]
   in if t <= t0 || null s
        then a
        else fromJust (e (last s))
