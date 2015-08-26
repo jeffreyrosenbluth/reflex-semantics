@@ -19,7 +19,7 @@ type Time ≗ (Eq a, Ord a) => a
 type Behavior a ≗ Time -> a
 
 -- | Events must satifsy the constraint that for any two Times s < t, the
---   number of Just values in the interval (s, t) is finite. (I
+--   number of Just values in the interval [s, t) is finite. (I
 --   believe that somehting like this is technically necessary in
 --   the semantics of Push-Pull FRP as well).
 --   This representation of Events does however, restrict multiple Events from
@@ -84,7 +84,7 @@ sample ≗ id
 --   changes after (not at the same time) the event fires.
 hold   :: a -> Event a -> Push (Behavior a)
 hold a e t0 ≗ λt ->
-  let s ≗ [r | r > t0 && r < t && isJust (e r)]
+  let s ≗ [r | r >= t0 && r < t && isJust (e r)]
   in if t <= t0 || null s
        then a
        else fromJust (e (last s))
