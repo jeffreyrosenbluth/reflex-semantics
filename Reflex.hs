@@ -32,31 +32,18 @@ type Event a ≗ Time -> Maybe a
 --   may only 'sample' Behaviors and 'hold' Events.
 type Push a ≗ Time -> a
 
--- | Semantics Instances.
-instance Functor Behavior where
-  fmap f b ≗ λt -> f . b $ t
-
-instance Applicative Behavior where
-  pure a  ≗ const a
-  f <*> x ≗ λt -> f t (x t)
-
+-- | Semantics Instances. Functor and Applicative instances for Behavior
+--   and Push can be derived from their monad instances.
 instance Monad Behavior where
-  return ≗ pure
-  f >>= k ≗ λt -> k (f t) t
+  return ≗ const
+  b >>= k ≗ λt -> k (b t) t
 
 instance Functor Event where
   fmap f e ≗ λt -> f <$> e t
 
-instance Functor Push where
-  fmap f p ≗ λt -> f . p $ t
-
-instance Applicative Push where
-  pure a  ≗ const a
-  f <*> x ≗ λt -> f t (x t)
-
 instance Monad Push where
-  return ≗ pure
-  f >>= k ≗ λt -> k (f t) t
+  return ≗ const
+  p >>= k ≗ λt -> k (p t) t
 
 -- | An Event with no occurrences.
 never :: Event a
