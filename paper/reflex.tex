@@ -1,0 +1,275 @@
+%-----------------------------------------------------------------------------
+%
+%               Template for sigplanconf LaTeX Class
+%
+% Name:         sigplanconf-template.tex
+%
+% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
+%               file for SIGPLAN conference proceedings.
+%
+% Guide:        Refer to "Author's Guide to the ACM SIGPLAN Class,"
+%               sigplanconf-guide.pdf
+%
+% Author:       Paul C. Anagnostopoulos
+%               Windfall Software
+%               978 371-2316
+%               paul@windfall.com
+%
+% Created:      15 February 2005
+%
+%-----------------------------------------------------------------------------
+
+
+\documentclass[preprint]{sigplanconf}
+
+% The following \documentclass options may be useful:
+
+% preprint      Remove this option only once the paper is in final form.
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\usepackage{amsmath}
+
+% What we've added
+\usepackage{fancyvrb}
+\usepackage{pifont}
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[x11names]{xcolor}
+\usepackage{framed}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{subcaption}
+\usepackage{comment}
+\usepackage{float}
+\usepackage{auxhook}  % move to our own FPG package
+\usepackage{refcount}
+\usepackage{enumerate}
+\usepackage{lipsum}
+%\usepackage{git-repo-version}
+%\usepackage{peer-review}
+\usepackage{bigfoot} % for verbatim in footnotes
+
+% from http://ctan.mackichan.com/graphics/pgf/contrib/pgf-umlsd/pgf-umlsd.sty,
+% from https://www.ctan.org/tex-archive/graphics/pgf/contrib/pgf-umlsd?lang=en
+\usepackage[underline=false,roundedcorners=false]{pgf-umlsd}
+
+\usepackage{tikz}
+
+\usetikzlibrary{shapes.symbols}
+\usetikzlibrary{patterns}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{decorations.pathreplacing}
+
+%\usepackage{parskip} % too crude
+
+% from http://tex.stackexchange.com/questions/191572/beginframed-with-background-color
+%\colorlet{shadecolor}{LavenderBlush2}
+%\colorlet{framecolor}{Red1}
+
+\definecolor{col:sync}{RGB}{120,0,0}
+\definecolor{col:async}{RGB}{0,120,0}
+\definecolor{col:nt}{RGB}{120,0,0}
+
+
+\newenvironment{frshaded}{%
+    \def\FrameCommand{\fboxrule=\FrameRule\fboxsep=\FrameSep  \fcolorbox{black}{white}}%
+    \MakeFramed {\FrameRestore}}%
+    {\endMakeFramed}
+
+\captionsetup[subfigure]{labelformat=simple}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+
+\newcommand{\cursor}{%
+\begin{center}
+\color{blue}
+\marginpar{\vskip 4pt\sc Cursor}
+\begin{tabular*}{\linewidth}{c}
+\hline
+\end{tabular*}
+\end{center}
+}
+\newcommand{\todo}[2][0pt]{%
+\marginpar[\raggedleft\vskip #1\tiny\color{red} #2]{\raggedright\vskip #1\tiny\color{red} #2}%
+}
+\newcommand{\good}[1][-0.7cm]{%
+\todo[#1]{\Huge\ding{51}}%
+}
+\newcommand{\bad}[1][-0.7cm]{%
+\todo[#1]{\Huge\ding{55}}%
+}
+\newcommand{\sectionline}{%
+  \nointerlineskip \vspace{\baselineskip}%
+  ~\hspace{\fill}\rule{0.5\columnwidth}{.7pt}\hspace{\fill}~%
+  \par\nointerlineskip \vspace{\baselineskip}
+}
+
+
+\DefineVerbatimEnvironment%
+  {Code}{Verbatim}
+  {samepage=true,commandchars=\\\{\},fontsize=\small,xleftmargin=1em}
+
+\DefineVerbatimEnvironment%
+  {Code*}{Verbatim}
+  {samepage=true,commandchars=\\\<\>,fontsize=\small,xleftmargin=1em}
+
+\DefineVerbatimEnvironment%
+  {SmallCode}{Verbatim}
+  {samepage=true,commandchars=\\\{\},fontsize=\scriptsize,xleftmargin=1em}
+
+%  {frame=lines,samepage=true,commandchars=\\\{\}}
+
+\DefineShortVerb{\|}
+\SaveVerb{Slash}|\|
+\newcommand{\lam}{\UseVerb{Slash}} % for use inside {Code}
+\SaveVerb{OpenSB}|[|
+\newcommand{\opensb}{\UseVerb{OpenSB}} % for use inside {Code}
+\SaveVerb{CloseSB}|]|
+\newcommand{\closesb}{\UseVerb{CloseSB}} % for use inside {Code}
+\SaveVerb{OpenCB}|{|
+\newcommand{\opencb}{\UseVerb{OpenCB}} % for use inside {Code}
+\SaveVerb{CloseCB}|}|
+\newcommand{\closecb}{\UseVerb{CloseCB}} % for use inside {Code}
+\UndefineShortVerb{\|}
+
+\newcommand{\hackage}[2][]{{\tt #2}#1~\cite{hackage:#2}}
+\newcommand{\github}[2][]{{\tt #2}#1~\cite{github:#2}}
+
+\newtheorem*{definition}{Definition}
+\newtheorem*{myproof}{Proof}
+\newtheorem*{mytheorem}{Theorem}
+
+\newcommand{\remotemonad}{remote monad}
+\newcommand{\remoteaf}{remote applicative functor}
+\newcommand{\IO}{{\tt IO}}
+\newcommand{\BlankCanvas}{Blank Canvas}
+\newcommand{\Canvas}{{\tt Canvas}}
+
+% This should be a common sty file?
+\makeatletter
+\newcounter{qfirstline}
+\newcounter{qfinalline}
+
+\newcommand{\quotecode}[3]{
+\ifnum0<0#2\relax% if start is a number
+ \setcounter{qfinalline}{#2}
+ \addtocounter{qfinalline}{#3}
+ \addtocounter{qfinalline}{-1}
+ \VerbatimInput[samepage=true,firstline=#2,lastline=\theqfinalline,fontsize=\small,xleftmargin=1em]{#1}%
+\else% otherwise we need a reference
+  \immediate\write\@auxout{\string\coderef{#1 #2}}
+  \setcounterref{qfirstline}{#1 #2}
+  \setcounterref{qfinalline}{#1 #2}
+  \addtocounter{qfinalline}{#3}
+  \addtocounter{qfinalline}{-1}
+  \ifnum\theqfirstline=0\relax
+   \vspace{0.2in}
+   (#1)
+  \else%
+   \VerbatimInput[samepage=true, firstline=\theqfirstline, lastline=\theqfinalline, fontsize=\small, xleftmargin=1em]{#1}%
+  \fi
+% does not work yet
+\fi%
+}
+% was going to add \noident, but its messy
+
+% add the ability to have a coderef
+\AddLineBeginAux{%
+  \string\providecommand\string\coderef[1]{}%
+}
+
+\def\codelabel#1#2{\@bsphack
+  \protected@write\@auxout{}%
+   {\string\newlabel{#1}{{#2}{\thepage}{}{Doc-Start}{}}}%
+  \@esphack}
+\makeatother
+
+% pull in the code references
+\input{coderef.aux}
+
+\begin{document}
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\conferenceinfo{CONF 'yy}{Month d--d, 20yy, City, ST, Country}
+\copyrightyear{20yy}
+\copyrightdata{978-1-nnnn-nnnn-n/yy/mm}
+\doi{nnnnnnn.nnnnnnn}
+
+% Uncomment one of the following two, if you are not going for the
+% traditional copyright transfer agreement.
+
+\toappear{Copyright held by author(s).
+This is the referee's version of the paper, for the purposes of peer-review.}
+
+
+%\exclusivelicense                % ACM gets exclusive license to publish,
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers,
+                                  % short abstracts)
+
+%\titlebanner{Early Draft}        % These are ignored unless
+%\preprintfooter{Early Draft}   % 'preprint' option specified.
+
+\title{High Performance FRP}
+%\subtitle{A Foreign Function Interface to the JavaScript Canvas API}
+
+\authorinfo{Ryan Trinkle%\titlenote{Corresponding author}
+  \and Jeffrey Rosenbluth}%\titlenote
+      % {Information and Telecommunication Technology Center, University of Kansas}
+       %{first.last@ittc.ku.edu}
+
+
+\maketitle
+
+\begin{abstract}
+Abstract
+\end{abstract}
+
+\category{D.3.2}{Programming Languages}
+                {Language Classifications}
+                [Applicative (functional) languages]
+
+\keywords
+FRP, Functional, Reactive.
+%Internet of Things.
+
+\section{Introduction}
+
+
+\begin{Code}
+
+type Event a = Time -> Maybe a
+
+instance Functor Behavior where
+fmap f b = {s} t -> f . b \$ t
+
+instance Applicative Behavior where
+pure a  = const a
+f <*> x = \lam t -> (f t) (x t)
+
+instance Monad Behavior where
+return = pure
+f >>= k = \lam t -> k (f t) t
+
+instance Functor Event where
+fmap f e = \lam t -> f <\$> e t
+
+never :: Event a
+never  \lam t -> Nothing
+
+
+\end{Code}
+
+
+
+\end{document}
