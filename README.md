@@ -1,10 +1,10 @@
-# reflex-semantics
+# Reflex-Semantics.hs
 Denotational semantics for reflex frp
 
-Questions
----------
+Questions & Todo
+----------------
 
 - [ ] Is this a valid denotational semantics?
-- [ ] Does spider faithfully implement this semantics?
-- [ ] Can our semantics be considered FRP?
-- [ ] Is this interface inherently leaky?
+- [x] Does spider faithfully implement this semantics?
+- [ ] Is this semantics consistent with classical FRP?
+- [ ] Prove this interface is not inherently leaky
